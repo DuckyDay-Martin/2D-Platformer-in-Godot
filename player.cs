@@ -7,7 +7,7 @@ public partial class player : CharacterBody2D
 	public const float JumpVelocity = -300.0f;
 	public const float DashSpeed = 650.0f;
 	public Vector2 dashDirection = new Vector2(1, 0);
-
+	bool canDoubleJump = true;
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
 	public float gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
 
@@ -15,7 +15,7 @@ public partial class player : CharacterBody2D
 	AnimatedSprite2D animatedSprite;
 	public override void _PhysicsProcess(double delta)
 	{
-         bool canDoubleJump = true;
+        
         Vector2 velocity = Velocity;
 		animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 
@@ -28,12 +28,17 @@ public partial class player : CharacterBody2D
 		if (Input.IsActionJustPressed("jump") && IsOnFloor())
 		{     
             velocity.Y = JumpVelocity;
-		}  
-		else if (!IsOnFloor() && Input.IsActionJustPressed("jump") && canDoubleJump)
-        {
-             canDoubleJump = false;
-             velocity.Y = JumpVelocity;
+            canDoubleJump = true;
         }
+        if (!IsOnFloor() && Input.IsActionJustPressed("jump") && canDoubleJump)
+        {
+            canDoubleJump = false;
+            velocity.Y = JumpVelocity;
+            GD.Print("DoubleJump");
+			
+        }
+
+
         //Gets movement direction: -1 ,0 ,1
         var direction = Input.GetAxis("move_left", "move_right");
 
@@ -75,16 +80,16 @@ public partial class player : CharacterBody2D
 		}
 
 		//Handle dash
-		if (Input.IsActionPressed("move_left") && Input.IsActionJustPressed("dash") && direction != 0)
-		{
-			dashDirection = Vector2.Left;
-			velocity = dashDirection.Normalized() * (Speed + DashSpeed);
-			GD.Print("DashLeft");
-		}
-		else 
-		{
-            velocity.X = Mathf.MoveToward(Velocity.X, 0, DashSpeed);
-        }
+		//if (Input.IsActionPressed("move_left") && Input.IsActionJustPressed("dash") && direction != 0)
+		//{
+		//	dashDirection = Vector2.Left;
+		//	velocity.X = dashDirection.Normalized() * (Speed + DashSpeed);
+		//	GD.Print("DashLeft");
+		//}
+		//else 
+		//{
+  //          velocity.X = Mathf.MoveToward(Velocity.X, 0, DashSpeed);
+  //      }
 
 
         //Apply the movement
